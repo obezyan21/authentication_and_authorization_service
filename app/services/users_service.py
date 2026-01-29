@@ -44,13 +44,13 @@ class UserService:
         user = result.scalar_one_or_none()
         
         if not user:
-            return None
+            raise HTTPException(status_code=404, detail="Пользователь не найден")
     
         if not verify_password(data.password, user.hashed_password):
-            return None
+            raise HTTPException(status_code=401, detail="Не правильный логин или пароль")
     
         if not user.is_active:
-            return None
+            raise HTTPException(status_code=401, detail="Пользователь неактивен")
         
         return ResponseSchema.model_validate(user)
 

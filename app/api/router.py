@@ -4,7 +4,7 @@ from app.database import DatabaseService
 from app.schemas.user_schemas import UserSchema, LoginSchema, UpdateSchema
 from app.schemas.permission_schemas import PermissionCreateSchema, PermissionUpdateSchema, PermissionResponseSchema, UserPermissionSchema
 from app.services.users_service import UserService
-from app.services.premission_service import PermissionService
+from app.services.permission_service import PermissionService
 from app.api.dependencies import get_current_user, require_admin, check_permission
 from app.database import SessionDep
 from app.services.dependencies import get_user_service, get_permission_service, get_db_service
@@ -28,7 +28,7 @@ async def login_user(data: LoginSchema, response: Response, user_service: UserSe
     result = await user_service.login_user(data)
     if result is None:
         raise HTTPException(status_code=401, detail="Неверный логин или пароль")
-    access_token =  create_access_token({"sub": str(result.id)})
+    access_token = create_access_token({"sub": str(result.id)})
     response.set_cookie(key="user_access_token", value=access_token, httponly=True)
     return {"access_token": access_token}
 

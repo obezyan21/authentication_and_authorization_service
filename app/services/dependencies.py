@@ -1,6 +1,6 @@
 from app.database import SessionDep
 from app.services.users_service import UserService
-from app.services.premission_service import PermissionService
+from app.services.permission_service import PermissionService
 from app.database import DatabaseService
 
 def get_user_service(session: SessionDep) -> UserService:

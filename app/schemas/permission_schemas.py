@@ -1,9 +1,9 @@
 from pydantic import BaseModel
-from app.models.database import UserRole
+from app.schemas.user_schemas import RoleEnum
 
 
 class PermissionCreateSchema(BaseModel):
-    role: UserRole
+    role: RoleEnum
     resource: str
     action: str
     allowed: bool = True

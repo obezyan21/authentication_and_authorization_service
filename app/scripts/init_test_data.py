@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy import select
 
 from app.database import Base
-from app.models.database import UserModel, Permissions, UserRole
+from app.models.database import UserModel, Permissions, RoleEnum
 from app.core.security import get_password_hash
 
 
@@ -29,7 +29,7 @@ async def init_test_data():
                 "surname": "Админов",
                 "email": "admin@example.com",
                 "password": "admin123",
-                "role": UserRole.ADMIN,
+                "role": RoleEnum.ADMIN,
                 "is_active": True
             },
             {
@@ -37,7 +37,7 @@ async def init_test_data():
                 "surname": "Менеджеров",
                 "email": "manager@example.com",
                 "password": "manager123",
-                "role": UserRole.MANAGER,
+                "role": RoleEnum.MANAGER,
                 "is_active": True
             },
             {
@@ -45,7 +45,7 @@ async def init_test_data():
                 "surname": "Иванов",
                 "email": "user@example.com",
                 "password": "user123",
-                "role": UserRole.USER,
+                "role": RoleEnum.USER,
                 "is_active": True
             },
             {
@@ -53,7 +53,7 @@ async def init_test_data():
                 "surname": "Петров",
                 "email": "viewer@example.com",
                 "password": "viewer123",
-                "role": UserRole.VIEWER,
+                "role": RoleEnum.VIEWER,
                 "is_active": True
             },
             {
@@ -61,7 +61,7 @@ async def init_test_data():
                 "surname": "Пользователь",
                 "email": "deleted@example.com",
                 "password": "deleted123",
-                "role": UserRole.USER,
+                "role": RoleEnum.USER,
                 "is_active": False
             }
         ]
@@ -81,48 +81,48 @@ async def init_test_data():
         
         test_permissions = [
             # Администратор - полный доступ ко всему
-            {"role": UserRole.ADMIN, "resource": "products", "action": "read", "allowed": True},
-            {"role": UserRole.ADMIN, "resource": "products", "action": "create", "allowed": True},
-            {"role": UserRole.ADMIN, "resource": "products", "action": "update", "allowed": True},
-            {"role": UserRole.ADMIN, "resource": "products", "action": "delete", "allowed": True},
-            {"role": UserRole.ADMIN, "resource": "orders", "action": "read", "allowed": True},
-            {"role": UserRole.ADMIN, "resource": "orders", "action": "create", "allowed": True},
-            {"role": UserRole.ADMIN, "resource": "orders", "action": "update", "allowed": True},
-            {"role": UserRole.ADMIN, "resource": "orders", "action": "delete", "allowed": True},
-            {"role": UserRole.ADMIN, "resource": "reports", "action": "read", "allowed": True},
+            {"role": RoleEnum.ADMIN, "resource": "products", "action": "read", "allowed": True},
+            {"role": RoleEnum.ADMIN, "resource": "products", "action": "create", "allowed": True},
+            {"role": RoleEnum.ADMIN, "resource": "products", "action": "update", "allowed": True},
+            {"role": RoleEnum.ADMIN, "resource": "products", "action": "delete", "allowed": True},
+            {"role": RoleEnum.ADMIN, "resource": "orders", "action": "read", "allowed": True},
+            {"role": RoleEnum.ADMIN, "resource": "orders", "action": "create", "allowed": True},
+            {"role": RoleEnum.ADMIN, "resource": "orders", "action": "update", "allowed": True},
+            {"role": RoleEnum.ADMIN, "resource": "orders", "action": "delete", "allowed": True},
+            {"role": RoleEnum.ADMIN, "resource": "reports", "action": "read", "allowed": True},
             
             # Менеджер - может читать и создавать продукты, управлять заказами
-            {"role": UserRole.MANAGER, "resource": "products", "action": "read", "allowed": True},
-            {"role": UserRole.MANAGER, "resource": "products", "action": "create", "allowed": True},
-            {"role": UserRole.MANAGER, "resource": "products", "action": "update", "allowed": True},
-            {"role": UserRole.MANAGER, "resource": "products", "action": "delete", "allowed": False},
-            {"role": UserRole.MANAGER, "resource": "orders", "action": "read", "allowed": True},
-            {"role": UserRole.MANAGER, "resource": "orders", "action": "create", "allowed": True},
-            {"role": UserRole.MANAGER, "resource": "orders", "action": "update", "allowed": True},
-            {"role": UserRole.MANAGER, "resource": "orders", "action": "delete", "allowed": False},
-            {"role": UserRole.MANAGER, "resource": "reports", "action": "read", "allowed": True},
-            
+            {"role": RoleEnum.MANAGER, "resource": "products", "action": "read", "allowed": True},
+            {"role": RoleEnum.MANAGER, "resource": "products", "action": "create", "allowed": True},
+            {"role": RoleEnum.MANAGER, "resource": "products", "action": "update", "allowed": True},
+            {"role": RoleEnum.MANAGER, "resource": "products", "action": "delete", "allowed": False},
+            {"role": RoleEnum.MANAGER, "resource": "orders", "action": "read", "allowed": True},
+            {"role": RoleEnum.MANAGER, "resource": "orders", "action": "create", "allowed": True},
+            {"role": RoleEnum.MANAGER, "resource": "orders", "action": "update", "allowed": True},
+            {"role": RoleEnum.MANAGER, "resource": "orders", "action": "delete", "allowed": False},
+            {"role": RoleEnum.MANAGER, "resource": "reports", "action": "read", "allowed": True},
+
             # Обычный пользователь - только чтение продуктов и создание заказов
-            {"role": UserRole.USER, "resource": "products", "action": "read", "allowed": True},
-            {"role": UserRole.USER, "resource": "products", "action": "create", "allowed": False},
-            {"role": UserRole.USER, "resource": "products", "action": "update", "allowed": False},
-            {"role": UserRole.USER, "resource": "products", "action": "delete", "allowed": False},
-            {"role": UserRole.USER, "resource": "orders", "action": "read", "allowed": True},
-            {"role": UserRole.USER, "resource": "orders", "action": "create", "allowed": True},
-            {"role": UserRole.USER, "resource": "orders", "action": "update", "allowed": False},
-            {"role": UserRole.USER, "resource": "orders", "action": "delete", "allowed": False},
-            {"role": UserRole.USER, "resource": "reports", "action": "read", "allowed": False},
+            {"role": RoleEnum.USER, "resource": "products", "action": "read", "allowed": True},
+            {"role": RoleEnum.USER, "resource": "products", "action": "create", "allowed": False},
+            {"role": RoleEnum.USER, "resource": "products", "action": "update", "allowed": False},
+            {"role": RoleEnum.USER, "resource": "products", "action": "delete", "allowed": False},
+            {"role": RoleEnum.USER, "resource": "orders", "action": "read", "allowed": True},
+            {"role": RoleEnum.USER, "resource": "orders", "action": "create", "allowed": True},
+            {"role": RoleEnum.USER, "resource": "orders", "action": "update", "allowed": False},
+            {"role": RoleEnum.USER, "resource": "orders", "action": "delete", "allowed": False},
+            {"role": RoleEnum.USER, "resource": "reports", "action": "read", "allowed": False},
             
             # Читатель - только чтение
-            {"role": UserRole.VIEWER, "resource": "products", "action": "read", "allowed": True},
-            {"role": UserRole.VIEWER, "resource": "products", "action": "create", "allowed": False},
-            {"role": UserRole.VIEWER, "resource": "products", "action": "update", "allowed": False},
-            {"role": UserRole.VIEWER, "resource": "products", "action": "delete", "allowed": False},
-            {"role": UserRole.VIEWER, "resource": "orders", "action": "read", "allowed": True},
-            {"role": UserRole.VIEWER, "resource": "orders", "action": "create", "allowed": False},
-            {"role": UserRole.VIEWER, "resource": "orders", "action": "update", "allowed": False},
-            {"role": UserRole.VIEWER, "resource": "orders", "action": "delete", "allowed": False},
-            {"role": UserRole.VIEWER, "resource": "reports", "action": "read", "allowed": False},
+            {"role": RoleEnum.VIEWER, "resource": "products", "action": "read", "allowed": True},
+            {"role": RoleEnum.VIEWER, "resource": "products", "action": "create", "allowed": False},
+            {"role": RoleEnum.VIEWER, "resource": "products", "action": "update", "allowed": False},
+            {"role": RoleEnum.VIEWER, "resource": "products", "action": "delete", "allowed": False},
+            {"role": RoleEnum.VIEWER, "resource": "orders", "action": "read", "allowed": True},
+            {"role": RoleEnum.VIEWER, "resource": "orders", "action": "create", "allowed": False},
+            {"role": RoleEnum.VIEWER, "resource": "orders", "action": "update", "allowed": False},
+            {"role": RoleEnum.VIEWER, "resource": "orders", "action": "delete", "allowed": False},
+            {"role": RoleEnum.VIEWER, "resource": "reports", "action": "read", "allowed": False},
         ]
         
         for perm_data in test_permissions:

@@ -6,7 +6,7 @@ from pydantic import BaseModel, EmailStr
 
 class RoleEnum(str, enum.Enum):
     ADMIN = "Администратор"
-    MANAGER = "Мэнэджер"
+    MANAGER = "Менеджер"
     USER = "Пользователь"
     VIEWER = "Читатель"
 
@@ -27,7 +27,7 @@ class ResponseSchema(BaseModel):
     name: str
     surname: str
     email: EmailStr
-    role: str
+    role: RoleEnum
     is_active: bool
     created_at: datetime
     updated_at: datetime

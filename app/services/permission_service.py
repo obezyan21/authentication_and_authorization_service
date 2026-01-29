@@ -1,7 +1,8 @@
 from fastapi import HTTPException
 from sqlalchemy import select
 
-from app.models.database import UserModel, Permissions, UserRole
+from app.models.database import UserModel, Permissions
+from app.schemas.user_schemas import RoleEnum
 from app.database import SessionDep
 
 
@@ -70,7 +71,7 @@ class PermissionService:
             for perm in permissions
         ]
 
-    async def create_permission(self, role: UserRole, resource: str, action: str, allowed: bool = True) -> dict:
+    async def create_permission(self, role: RoleEnum, resource: str, action: str, allowed: bool = True) -> dict:
         existing_query = select(Permissions).where(
             Permissions.role == role,
             Permissions.resource == resource,

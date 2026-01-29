@@ -5,8 +5,9 @@ from sqlalchemy import select
 
 from app.database import SessionDep
 from app.core.security import verify_token
-from app.models.database import UserModel, UserRole
-from app.services.premission_service import PermissionService
+from app.models.database import UserModel
+from app.schemas.user_schemas import RoleEnum
+from app.services.permission_service import PermissionService
 
 async def get_current_user(request: Request, session: SessionDep) -> int:
     token = request.cookies.get("user_access_token")
@@ -35,7 +36,7 @@ async def get_current_user(request: Request, session: SessionDep) -> int:
     return user_id_int
 
 
-async def get_current_user_with_role(request: Request, session: SessionDep) -> tuple[int, UserRole]:
+async def get_current_user_with_role(request: Request, session: SessionDep) -> tuple[int, RoleEnum]:
     user_id = await get_current_user(request, session)
     
     user_query = select(UserModel).where(UserModel.id == user_id)
@@ -51,7 +52,7 @@ async def get_current_user_with_role(request: Request, session: SessionDep) -> t
 async def require_admin(request: Request, session: SessionDep) -> int:
     user_id, role = await get_current_user_with_role(request, session)
     
-    if role != UserRole.ADMIN:
+    if role != RoleEnum.ADMIN:
         raise HTTPException(
             status_code=403,
             detail="Доступ запрещен. Требуется роль администратора"
