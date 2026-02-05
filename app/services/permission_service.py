@@ -16,7 +16,7 @@ class PermissionService:
         user = user_result.scalar_one_or_none()
         
         if not user or not user.is_active:
-            return False
+            raise HTTPException(status_code=404, detail="Пользователь не найден или удален")
         
         permission_query = select(Permissions).where(
             Permissions.role == user.role,
@@ -27,7 +27,7 @@ class PermissionService:
         permission = permission_result.scalar_one_or_none()
         
         if not permission:
-            return False
+            raise HTTPException(status_code=404, detail="Разрешение не найдено")
         
         return permission.allowed
 
@@ -37,7 +37,7 @@ class PermissionService:
         user = user_result.scalar_one_or_none()
         
         if not user or not user.is_active:
-            return []
+            raise HTTPException(status_code=404, detail="Пользователь не найден или удален")
         
         permissions_query = select(Permissions).where(
             Permissions.role == user.role,
@@ -132,7 +132,7 @@ class PermissionService:
         if not permission:
             raise HTTPException(status_code=404, detail="Правило доступа не найдено")
         
-        await self.session.delete(permission)
+        self.session.delete(permission)
         await self.session.commit()
         
         return {"message": "Правило доступа удалено"}

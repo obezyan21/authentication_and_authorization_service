@@ -1,13 +1,11 @@
 from datetime import datetime, timezone
 
 import pytest
-from fastapi import HTTPException
-from unittest.mock import AsyncMock, MagicMock, patch
-from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import ValidationError
 
-from app.services.users_service import UserService
 from app.schemas.user_schemas import RoleEnum, UserSchema, LoginSchema, ResponseSchema, UpdateSchema
+from app.schemas.permission_schemas import PermissionCreateSchema, PermissionResponseSchema, PermissionUpdateSchema, UserPermissionSchema
+
 
 def test_user_schema_valid():
     user = UserSchema(
@@ -44,6 +42,7 @@ def test_user_schema_invalid():
         )
 
     errors = val_err.value.errors()
+
     assert any("email" in error["loc"] for error in errors)
     assert any("role" in error["loc"] for error in errors)
 
@@ -52,6 +51,7 @@ def test_login_schema_valid():
             email= "test@email.com",
             password= "test"
         )
+
         assert login_data.email == "test@email.com"
 
 def test_login_schema_invalid():
@@ -62,6 +62,7 @@ def test_login_schema_invalid():
         )
         
     errors = val_err.value.errors()
+
     assert any("email" in error["loc"] for error in errors)
 
 def test_response_schema_valid():
@@ -75,6 +76,7 @@ def test_response_schema_valid():
         created_at = datetime.now(timezone.utc),
         updated_at = datetime.now(timezone.utc)
     )
+
     assert data.email == "test@email.com"
     assert data.role == RoleEnum.USER
 
@@ -90,7 +92,9 @@ def test_response_schema_invalid():
             created_at = datetime.now(timezone.utc),
             updated_at = datetime.now(timezone.utc)
         )
+
     errors = val_err.value.errors()
+
     assert any("email" in error["loc"] for error in errors)
     assert any("role" in error["loc"] for error in errors)
 
@@ -112,4 +116,99 @@ def test_update_schema_invalid():
     )
     
     errors = val_err.value.errors()
+
     assert any("email" in error["loc"] for error in errors)
+
+def test_perm_create_schema_valid():
+    data = PermissionCreateSchema(
+    role = RoleEnum.USER,
+    resource = "products",
+    action = "read",
+    allowed = True
+    )
+
+    assert data.role == RoleEnum.USER
+    assert isinstance(data.allowed, bool)
+
+def test_perm_create_schema_invalid():
+    with pytest.raises(ValidationError) as val_err:
+        data = PermissionCreateSchema(
+        role = "user",
+        resource = "products",
+        action = "read",
+        allowed = 123
+        )
+
+    errors = val_err.value.errors()
+
+    assert any("role" in error["loc"] for error in errors)
+    assert any("allowed" in error["loc"] for error in errors)
+
+def test_perm_update_schema_valid():
+    data = PermissionUpdateSchema(
+        allowed=True
+    )
+
+    assert isinstance(data.allowed, bool)
+
+def test_perm_update_schema_invalid():
+    with pytest.raises(ValidationError) as val_err:
+        data = PermissionUpdateSchema(
+        allowed=123
+    )
+        
+    errors = val_err.value.errors()
+
+    assert any("allowed" in error["loc"] for error in errors)
+
+def test_perm_response_schema_valid():
+    data = PermissionResponseSchema(
+    id = 1,
+    role = RoleEnum.USER,
+    resource = "products",
+    action = "read",
+    allowed = True
+    )
+
+    assert isinstance(data.id, int)
+    assert data.role == RoleEnum.USER
+    assert isinstance(data.allowed, bool)
+
+def test_perm_response_schema_invalid():
+    with pytest.raises(ValidationError) as val_err:
+        data = PermissionResponseSchema(
+        id = "test",
+        role = "123",
+        resource = "products",
+        action = "read",
+        allowed = 123
+        )
+
+    errors = val_err.value.errors()
+
+    assert any("id" in error["loc"] for error in errors)
+    assert any("role" in error["loc"] for error in errors)
+    assert any("allowed" in error["loc"] for error in errors)
+
+def test_user_permission_schema_valid():
+    data = UserPermissionSchema(
+        resource = "products",
+        action = "read",
+        allowed = True
+    )
+
+    assert isinstance(data.allowed, bool)
+
+def test_user_permission_schema_invalid():
+    with pytest.raises(ValidationError) as val_err:
+        data = UserPermissionSchema(
+            resource = 1,
+            action = 2,
+            allowed = 3
+        )
+    
+    errors = val_err.value.errors()
+
+    assert any("resource" in error["loc"] for error in errors)
+    assert any("action" in error["loc"] for error in errors)
+    assert any("allowed" in error["loc"] for error in errors)

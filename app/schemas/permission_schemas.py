@@ -15,7 +15,7 @@ class PermissionUpdateSchema(BaseModel):
 
 class PermissionResponseSchema(BaseModel):
     id: int
-    role: str
+    role: RoleEnum
     resource: str
     action: str
     allowed: bool

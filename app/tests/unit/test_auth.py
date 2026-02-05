@@ -1,8 +1,5 @@
 from datetime import datetime, timezone
 
-import pytest
-from unittest.mock import MagicMock, patch
-
 from app.core.security import get_password_hash, verify_password, create_access_token, verify_token
 
 
